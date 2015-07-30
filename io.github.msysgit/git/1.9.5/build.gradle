@@ -47,7 +47,9 @@ task buildPackage(type: Jar, dependsOn: customizePackage) {
 	version version
 	extension 'jar'
 	destinationDir buildDir
-	from "$buildDir/files"
+	from ("$buildDir/files") {
+		exclude '**/libexec/**/*'
+	}
 }
 
 publishing {
