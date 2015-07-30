@@ -53,7 +53,7 @@ task wrapper(type: Wrapper) {
 
 publishing {
     publications {
-        apacheTomcat7(MavenPublication) {
+        apacheTomcat8(MavenPublication) {
 			artifact "${buildDir}/${project.name}-${version}.jar"
 		}
     }
@@ -72,7 +72,7 @@ publishing {
 bintray {
     user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
     key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
-    publications = ['apacheTomcat7']
+    publications = ['apacheTomcat8']
     pkg {
         repo = project.bintrayRepo
         name = project.name
