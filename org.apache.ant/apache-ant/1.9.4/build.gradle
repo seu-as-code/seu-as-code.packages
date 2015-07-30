@@ -49,12 +49,9 @@ publishing {
     }
 }
 
-if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = 'unknown'
-if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = 'unknown'
-
 bintray {
-    user = project.bintrayUsername
-    key = project.bintrayApiKey
+    user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
+    key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
     publications = ['ant']
     pkg {
         repo = project.bintrayRepo
@@ -69,7 +66,10 @@ bintray {
         version {
             name = project.version
 			desc = "${project.description} ${project.version}"
-            released = new Date()
+			released = new Date().format('yyyy-MM-dd')
         }
+		mavenCentralSync {
+            sync = false
+		}
     }
 }
