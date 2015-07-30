@@ -1,0 +1,6 @@
+alias ll='ls --color=auto -la'
+alias dir='ls --color=auto -l'
+alias more='less'
+alias gohome='cd ~'
+alias gocode='cd ~/../codebase/'
+alias reload='source $HOME/.bashrc'
