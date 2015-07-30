@@ -1,0 +1,75 @@
+plugins {
+	id 'de.undercouch.download' version '1.2'
+	id 'com.jfrog.bintray' version '1.2'
+}
+
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadArchive(type: Download) {
+	src "http://archive.apache.org/dist/ant/binaries/${project.name}-${version}-bin.zip"
+    dest buildDir
+}
+
+task extractArchive(type: Copy, dependsOn: downloadArchive) {	
+	from { zipTree("$buildDir/${project.name}-${version}-bin.zip") }
+	into "$buildDir/files"
+}
+
+task buildPackage(type: Jar, dependsOn: extractArchive) {
+	baseName project.name
+	version version
+	extension 'jar'
+	destinationDir buildDir
+	from "$buildDir/files"
+	from "files"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
+publishing {
+    publications {
+		ant(MavenPublication) {
+			artifact "${buildDir}/${project.name}-${version}.jar"
+		}
+    }
+	repositories {
+		// set the properties via -P to publish to your company repo
+		maven {  			
+			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+			credentials {
+				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+			}			
+		}
+    }
+}
+
+if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = 'unknown'
+if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = 'unknown'
+
+bintray {
+    user = project.bintrayUsername
+    key = project.bintrayApiKey
+    publications = ['ant']
+    pkg {
+        repo = project.bintrayRepo
+        name = project.name
+        desc = project.description		
+        licenses = ['Apache-2.0']
+        labels = ['apache-ant', 'seu-as-code', 'package']
+		websiteUrl = project.websiteUrl
+        issueTrackerUrl = project.issueTrackerUrl
+        vcsUrl = project.scmUrl
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+			desc = "${project.description} ${project.version}"
+            released = new Date()
+        }
+    }
+}
