@@ -63,13 +63,15 @@ bintray {
         issueTrackerUrl = project.issueTrackerUrl
         vcsUrl = project.scmUrl
         publicDownloadNumbers = true
+        publish = true
         version {
             name = project.version
 			desc = "${project.description} ${project.version}"
-			released = new Date().format('yyyy-MM-dd')
-        }
-		mavenCentralSync {
-            sync = false
-		}
+			released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+			
+			mavenCentralSync {
+				sync = false
+			}
+        }	
     }
 }
