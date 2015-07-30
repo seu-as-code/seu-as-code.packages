@@ -47,6 +47,10 @@ task buildPackage(type: Jar, dependsOn: customizePackage) {
 	from "$buildDir/files"
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
 publishing {
     publications {
 		maven(MavenPublication) {
