@@ -63,9 +63,9 @@ task wrapper(type: Wrapper) {
 publishing {
     publications {
 		seuacEnvironment(MavenPublication) {
-			artifact "${buildDir}/${project.name}-${version}.jar"
-			artifact "${buildDir}/${project.name}-${version}-jdk7.jar"
-			artifact "${buildDir}/${project.name}-${version}-jdk8.jar"
+			artifact buildPackageDefault
+			artifact buildPackageJdk7
+			artifact buildPackageJdk8
 		}
     }
 	repositories {
