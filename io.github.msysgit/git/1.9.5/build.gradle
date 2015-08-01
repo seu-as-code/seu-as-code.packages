@@ -74,6 +74,8 @@ bintray {
     user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
     key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
     publications = ['git195']
+	publish = true
+	dryRun = false
     pkg {
         repo = project.bintrayRepo
         name = project.name
@@ -84,7 +86,7 @@ bintray {
         issueTrackerUrl = project.issueTrackerUrl
         vcsUrl = project.scmUrl
         publicDownloadNumbers = true
-        publish = true
+        
         version {
             name = project.version
 			desc = "${project.description} ${project.version}"
