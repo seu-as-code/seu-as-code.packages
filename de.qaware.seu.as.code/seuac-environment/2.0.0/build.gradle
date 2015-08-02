@@ -53,7 +53,7 @@ task buildPackageJdk8(type: Jar) {
 	from ("files/default") {
 		exclude 'set-env.cmd'
 	}
-	from "files/jdk7"
+	from "files/jdk8"
 }
 
 task wrapper(type: Wrapper) {
