@@ -9,6 +9,9 @@ apply plugin: 'maven-publish'
 
 import de.undercouch.gradle.tasks.download.Download
 
+task buildPackage(dependsOn: ['buildPackageFull', 'buildPackageWeb']) {
+}
+
 task downloadArchiveFull(type: Download) {
     src "http://download.java.net/glassfish/${version}/release/glassfish-${version}.zip"
     dest buildDir
@@ -53,7 +56,7 @@ task buildPackageWeb(type: Jar, dependsOn: extractArchiveWeb) {
     extension 'jar'
 	classifier 'web'
     destinationDir buildDir
-    from "$buildDir/full"
+    from "$buildDir/web"
 }
 
 publishing {
