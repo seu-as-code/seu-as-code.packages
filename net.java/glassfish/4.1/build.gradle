@@ -1,0 +1,105 @@
+
+plugins {
+	id 'de.undercouch.download' version '1.2'
+	id 'com.jfrog.bintray' version '1.2'
+}
+
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadArchiveFull(type: Download) {
+    src "http://download.java.net/glassfish/${version}/release/glassfish-${version}.zip"
+    dest buildDir
+}
+
+task extractArchiveFull(type: Copy, dependsOn: downloadArchiveFull) {
+    from { zipTree("$buildDir/glassfish-${version}.zip") }
+    into "$buildDir/full"
+}
+
+task customizePackageFull(type: Copy, dependsOn: extractArchiveFull) {
+	from "files"
+	into "$buildDir/full"
+}
+
+task buildPackageFull(type: Jar, dependsOn: customizePackageFull) {
+    baseName project.name
+    version version
+    extension 'jar'
+    destinationDir buildDir
+    from "$buildDir/full"
+}
+
+task downloadArchiveWeb(type: Download) {
+    src "http://download.java.net/glassfish/${version}/release/glassfish-${version}-web.zip"
+    dest buildDir
+}
+
+task extractArchiveWeb(type: Copy, dependsOn: downloadArchiveWeb) {
+    from { zipTree("$buildDir/glassfish-${version}-web.zip") }
+    into "$buildDir/web"
+}
+
+task customizePackageWeb(type: Copy, dependsOn: extractArchiveWeb) {
+	from "files"
+	into "$buildDir/web"
+}
+
+task buildPackageWeb(type: Jar, dependsOn: extractArchiveWeb) {
+    baseName project.name
+    version version
+    extension 'jar'
+	classifier 'web'
+    destinationDir buildDir
+    from "$buildDir/full"
+}
+
+publishing {
+    publications {
+        glassfish4(MavenPublication) {
+            artifact buildPackageFull
+            artifact buildPackageWeb
+        }
+    }
+    repositories {
+		// set the properties via -P to publish to your company repo
+		maven {  			
+			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+			credentials {
+				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+			}			
+		}
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
+    key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
+    publications = ['glassfish4']
+	publish = true
+	dryRun = false
+    pkg {
+        repo = project.bintrayRepo
+        name = project.name
+        desc = project.description		
+        licenses = ['GPL-2.0+CE', 'CDDL-1.1]
+        labels = ['glassfish', 'jee7', 'seu-as-code', 'package']
+		websiteUrl = project.websiteUrl
+        issueTrackerUrl = project.issueTrackerUrl
+        vcsUrl = project.scmUrl
+        publicDownloadNumbers = true
+        
+        version {
+            name = project.version
+			desc = "${project.description} ${project.version}"
+			released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+			
+			mavenCentralSync {
+				sync = false
+			}
+        }	
+    }
+}
