@@ -63,7 +63,7 @@ bintray {
         repo = project.bintrayRepo
         name = project.name
         desc = project.description		
-        licenses = ['GPL-2.0']
+        licenses = ['GPL-2.0', 'LGPL-2.1']
         labels = ['git', 'scm', 'seu-as-code', 'package']
 		websiteUrl = project.websiteUrl
         issueTrackerUrl = project.issueTrackerUrl
