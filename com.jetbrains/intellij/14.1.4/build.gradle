@@ -1,7 +1,6 @@
 
 plugins {
 	id 'de.undercouch.download' version '1.2'
-	id 'com.jfrog.bintray' version '1.2'
 }
 
 apply plugin: 'base'
@@ -10,12 +9,12 @@ apply plugin: 'maven-publish'
 import de.undercouch.gradle.tasks.download.Download
 
 task downloadArchive(type: Download) {
-    src "http://download.jetbrains.com/idea/ideaIC-${version}.zip"
+    src "http://download.jetbrains.com/idea/ideaIU-${version}.zip"
     dest buildDir
 }
 
 task extractArchive(type: Copy, dependsOn: downloadArchive) {
-    from { zipTree("$buildDir/ideaIC-${version}.zip") }
+    from { zipTree("$buildDir/ideaIU-${version}.zip") }
     into "$buildDir/files/intellij-${version}"
 }
 
@@ -47,34 +46,5 @@ publishing {
 				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
 			}			
 		}
-    }
-}
-
-bintray {
-    user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
-    key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
-    publications = ['intellij']
-	publish = true
-	dryRun = false
-    pkg {
-        repo = project.bintrayRepo
-        name = project.name
-        desc = project.description		
-        licenses = ['Apache-2.0']
-        labels = ['intellij', 'ide', 'seu-as-code', 'package']
-		websiteUrl = project.websiteUrl
-        issueTrackerUrl = project.issueTrackerUrl
-        vcsUrl = project.scmUrl
-        publicDownloadNumbers = true
-        
-        version {
-            name = project.version
-			desc = "${project.description} ${project.version}"
-			released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
-			
-			mavenCentralSync {
-				sync = false
-			}
-        }	
     }
 }
