@@ -11,24 +11,25 @@ import de.undercouch.gradle.tasks.download.Download
 
 task mkdirs << {
     file("$buildDir/files/i386").mkdirs()
-    file("$buildDir/files/x64").mkdirs()
+    file("$buildDir/files/amd64").mkdirs()
 }
 
 task downloadArchive32(type: Download) {
-    src "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.2-i386-mingw32.7z"
+    src "https://storage.googleapis.com/golang/go1.4.2.windows-386.zip"
     dest buildDir
 }
 
-task extractArchive32(type: Exec, dependsOn: [mkdirs, downloadArchive32]) {
-    commandLine 'cmd', '/c', '7z.exe', 'x', "$buildDir/ruby-2.2.2-i386-mingw32.7z", "-o$buildDir/files/i386"
+task extractArchive32(type: Copy, dependsOn: downloadArchive32) {
+	from { zipTree("$buildDir/${project.name}${version}.windows-386.zip") }
+	into "$buildDir/files/i386"
 }
 task renameDirectory32() << {
-    file("$buildDir/files/i386/ruby-2.2.2-i386-mingw32").renameTo(file("$buildDir/files/i386/${project.name}-${version}-i386"))
+    file("$buildDir/files/i386/go").renameTo(file("$buildDir/files/i386/${project.name}-${version}"))
 }
 extractArchive32.finalizedBy renameDirectory32
 
 task customizePackage32(type: Copy, dependsOn: extractArchive32) {
-    from "files/i386"
+    from "files"
     into "$buildDir/files/i386"
 }
 
@@ -42,30 +43,31 @@ task buildPackage32(type: Jar, dependsOn: customizePackage32) {
 }
 
 task downloadArchive64(type: Download) {
-    src "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.2-x64-mingw32.7z"
+    src "https://storage.googleapis.com/golang/go1.4.2.windows-amd64.zip"
     dest buildDir
 }
 
-task extractArchive64(type: Exec, dependsOn: [mkdirs, downloadArchive64]) {
-    commandLine 'cmd', '/c', '7z.exe', 'x', "$buildDir/ruby-2.2.2-x64-mingw32.7z", "-o$buildDir/files/x64"
+task extractArchive64(type: Copy, dependsOn: downloadArchive64) {
+	from { zipTree("$buildDir/${project.name}${version}.windows-amd64.zip") }
+	into "$buildDir/files/amd64"
 }
 task renameDirectory64() << {
-    file("$buildDir/files/x64/ruby-2.2.2-x64-mingw32").renameTo(file("$buildDir/files/x64/${project.name}-${version}-x64"))
+    file("$buildDir/files/amd64/go").renameTo(file("$buildDir/files/amd64/${project.name}-${version}"))
 }
 extractArchive64.finalizedBy renameDirectory64
 
 task customizePackage64(type: Copy, dependsOn: extractArchive64) {
-    from "files/x64"
-    into "$buildDir/files/x64"
+    from "files"
+    into "$buildDir/files/amd64"
 }
 
 task buildPackage64(type: Jar, dependsOn: customizePackage64) {
 	baseName project.name
 	version version
 	extension 'jar'
-	classifier 'x64'
+	classifier 'amd64'
 	destinationDir buildDir	
-	from "$buildDir/files/x64"
+	from "$buildDir/files/amd64"
 }
 
 task buildPackage(dependsOn: ['buildPackage32', 'buildPackage64']) {
@@ -73,7 +75,7 @@ task buildPackage(dependsOn: ['buildPackage32', 'buildPackage64']) {
 
 publishing {
     publications {
-		ruby222(MavenPublication) {
+		go142(MavenPublication) {
 			artifact buildPackage32
 			artifact buildPackage64
 		}
@@ -93,15 +95,15 @@ publishing {
 bintray {
     user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
     key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
-    publications = ['ruby222']
+    publications = ['go142']
 	publish = true
 	dryRun = false
     pkg {
         repo = project.bintrayRepo
         name = project.name
-        desc = "${project.description}. See http://rubyinstaller.org"
+        desc = ${project.description}
         licenses = ['BSD']
-        labels = ['ruby', 'seu-as-code', 'package']
+        labels = ['go', 'seu-as-code', 'package']
 		websiteUrl = project.websiteUrl
         issueTrackerUrl = project.issueTrackerUrl
         vcsUrl = project.scmUrl
@@ -109,7 +111,7 @@ bintray {
         
         version {
             name = project.version
-			desc = "${project.description} ${project.version}. See http://rubyinstaller.org"
+			desc = "${project.description} ${project.version}"
 			released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
 			
 			mavenCentralSync {
