@@ -1,0 +1,120 @@
+
+plugins {
+	id 'de.undercouch.download' version '1.2'
+	id 'com.jfrog.bintray' version '1.2'
+}
+
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+import de.undercouch.gradle.tasks.download.Download
+
+task mkdirs << {
+    file("$buildDir/files/i386").mkdirs()
+    file("$buildDir/files/x64").mkdirs()
+}
+
+task downloadArchive32(type: Download) {
+    src "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.2-i386-mingw32.7z"
+    dest buildDir
+}
+
+task extractArchive32(type: Exec, dependsOn: [mkdirs, downloadArchive32]) {
+    commandLine 'cmd', '/c', '7z.exe', 'x', "$buildDir/ruby-2.2.2-i386-mingw32.7z", "-o$buildDir/files/i386"
+}
+task renameDirectory32() << {
+    file("$buildDir/files/i386/ruby-2.2.2-i386-mingw32").renameTo(file("$buildDir/files/i386/${project.name}-${version}-i386"))
+}
+extractArchive32.finalizedBy renameDirectory32
+
+task customizePackage32(type: Copy, dependsOn: extractArchive32) {
+    from "files/i386"
+    into "$buildDir/files/i386"
+}
+
+task buildPackage32(type: Jar, dependsOn: customizePackage32) {
+	baseName project.name
+	version version
+	extension 'jar'
+	classifier 'i386'
+	destinationDir buildDir	
+	from "$buildDir/files/i386"
+}
+
+task downloadArchive64(type: Download) {
+    src "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.2-x64-mingw32.7z"
+    dest buildDir
+}
+
+task extractArchive64(type: Exec, dependsOn: [mkdirs, downloadArchive64]) {
+    commandLine 'cmd', '/c', '7z.exe', 'x', "$buildDir/ruby-2.2.2-x64-mingw32.7z", "-o$buildDir/files/x64"
+}
+task renameDirectory64() << {
+    file("$buildDir/files/x64/ruby-2.2.2-x64-mingw32").renameTo(file("$buildDir/files/x64/${project.name}-${version}-x64"))
+}
+extractArchive64.finalizedBy renameDirectory64
+
+task customizePackage64(type: Copy, dependsOn: extractArchive64) {
+    from "files/x64"
+    into "$buildDir/files/x64"
+}
+
+task buildPackage64(type: Jar, dependsOn: customizePackage64) {
+	baseName project.name
+	version version
+	extension 'jar'
+	classifier 'x64'
+	destinationDir buildDir	
+	from "$buildDir/files/x64"
+}
+
+task buildPackage(dependsOn: ['buildPackage32', 'buildPackage64']) {
+}
+
+publishing {
+    publications {
+		ruby222(MavenPublication) {
+			artifact buildPackage32
+			artifact buildPackage64
+		}
+    }
+	repositories {
+		// set the properties via -P to publish to your company repo
+		maven {  			
+			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+			credentials {
+				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+			}			
+		}
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
+    key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
+    publications = ['ruby222']
+	publish = true
+	dryRun = false
+    pkg {
+        repo = project.bintrayRepo
+        name = project.name
+        desc = "${project.description}. See http://rubyinstaller.org"
+        licenses = ['BSD']
+        labels = ['ruby', 'seu-as-code', 'package']
+		websiteUrl = project.websiteUrl
+        issueTrackerUrl = project.issueTrackerUrl
+        vcsUrl = project.scmUrl
+        publicDownloadNumbers = true
+        
+        version {
+            name = project.version
+			desc = "${project.description} ${project.version}. See http://rubyinstaller.org"
+			released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+			
+			mavenCentralSync {
+				sync = false
+			}
+        }	
+    }
+}
