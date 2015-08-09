@@ -99,8 +99,8 @@ bintray {
     pkg {
         repo = project.bintrayRepo
         name = project.name
-        desc = project.description		
-        licenses = ['MIT']
+        desc = "${project.description}. See http://rubyinstaller.org"
+        licenses = ['BSD']
         labels = ['ruby', 'seu-as-code', 'package']
 		websiteUrl = project.websiteUrl
         issueTrackerUrl = project.issueTrackerUrl
@@ -109,7 +109,7 @@ bintray {
         
         version {
             name = project.version
-			desc = "${project.description} ${project.version}"
+			desc = "${project.description} ${project.version}. See http://rubyinstaller.org"
 			released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
 			
 			mavenCentralSync {
