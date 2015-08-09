@@ -101,7 +101,7 @@ bintray {
     pkg {
         repo = project.bintrayRepo
         name = project.name
-        desc = ${project.description}
+        desc = project.description
         licenses = ['BSD']
         labels = ['go', 'seu-as-code', 'package']
 		websiteUrl = project.websiteUrl
