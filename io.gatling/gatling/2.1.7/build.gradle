@@ -1,0 +1,58 @@
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'de.undercouch:gradle-download-task:1.0'
+    }
+}
+
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadArchive(type: Download) {
+    src "http://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts/${version}/gatling-charts-highcharts-${version}-bundle.zip"
+    dest buildDir
+}
+
+task extractArchive(type: Copy, dependsOn: downloadArchive) {	
+	from { zipTree("$buildDir/gatling-charts-highcharts-${version}-bundle.zip") }
+	into "$buildDir/files"
+}
+
+task renameDirectory() << {    
+    file("$buildDir/files/gatling-charts-highcharts-${version}").renameTo(file("$buildDir/files/${project.name}-${version}"))
+}
+extractArchive.finalizedBy renameDirectory
+
+task customizePackage(type: Copy, dependsOn: extractArchive) {
+    from "files"
+    into "$buildDir/files"
+}
+
+task buildPackage(type: Jar, dependsOn: customizePackage) {
+    baseName project.name
+    version version
+    extension 'jar'
+    destinationDir buildDir
+    from "$buildDir/files"
+}
+
+publishing {
+    publications {
+        gatling(MavenPublication) {
+            artifact "${buildDir}/${project.name}-${version}.jar"
+        }
+    }
+    repositories {
+        maven {
+            url 'https://www.qaware.de:443/nexus/content/repositories/qaware-seu/'
+            credentials {
+                username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+            }
+        }
+    }
+}
