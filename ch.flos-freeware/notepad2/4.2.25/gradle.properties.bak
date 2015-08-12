@@ -1,8 +1,0 @@
-group=io.github.conemu
-version=4.2.25
-
-description=The SEU-as-Code package for ConEmu
-websiteUrl=https://github.com/seu-as-code/seu-as-code.packages/tree/master/io.github.conemu/conemu/150705
-scmUrl=https://github.com/seu-as-code/seu-as-code.packages.git
-issueTrackerUrl=https://github.com/seu-as-code/seu-as-code.packages/issues
-bintrayRepo=maven
