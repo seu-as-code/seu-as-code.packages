@@ -62,7 +62,7 @@ bintray {
         repo = project.bintrayRepo
         name = project.name
         desc = project.description		
-        licenses = ['BSD3-Clause']
+        licenses = ['BSD 3-Clause']
         labels = ['conemu', 'console', 'shell', 'seu-as-code', 'package']
 		websiteUrl = project.websiteUrl
         issueTrackerUrl = project.issueTrackerUrl
