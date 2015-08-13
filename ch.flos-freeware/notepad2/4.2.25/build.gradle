@@ -1,0 +1,82 @@
+plugins {
+    id 'de.undercouch.download' version '1.2'
+    id 'com.jfrog.bintray' version '1.2'
+}
+
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadArchive(type: Download) {
+    src "http://www.flos-freeware.ch/zip/notepad2_4.2.25_x64.zip"
+    dest buildDir
+}
+
+task mkdirs << {
+	file("$buildDir/files/notepad2-4.2.25").mkdirs()
+}
+
+task extractArchive(type: Exec, dependsOn: [mkdirs, downloadArchive]) {
+    commandLine 'cmd', '/c', '7z.exe', 'x', "$buildDir/notepad2_4.2.25_x64.zip", "-o$buildDir/files/notepad2-4.2.25"
+}
+
+task customizePackage(type: Copy, dependsOn: extractArchive) {
+    from "files"
+    into "$buildDir/files"
+}
+
+task buildPackage(type: Jar, dependsOn: customizePackage) {
+    baseName project.name
+    version version
+    extension 'jar'
+    destinationDir buildDir
+    from "$buildDir/files"
+}
+
+publishing {
+    publications {
+        notepad24225(MavenPublication) {
+            artifact "${buildDir}/${project.name}-${version}.jar"
+        }
+    }
+    repositories {
+        // set the properties via -P to publish to your company repo
+        maven {
+            url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+            credentials {
+                username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+                password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+            }
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
+    key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
+    publications = ['notepad24225']
+	publish = true
+	dryRun = false
+    pkg {
+        repo = project.bintrayRepo
+        name = project.name
+        desc = project.description		
+        licenses = ['BSD']
+        labels = ['notepad2', 'editor', 'seu-as-code', 'package']
+		websiteUrl = project.websiteUrl
+        issueTrackerUrl = project.issueTrackerUrl
+        vcsUrl = project.scmUrl
+        publicDownloadNumbers = true
+        
+        version {
+            name = project.version
+			desc = "${project.description} ${project.version}"
+			released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+			
+			mavenCentralSync {
+				sync = false
+			}
+        }	
+    }
+}

@@ -1,0 +1,4 @@
+@echo off
+
+set CONEMU_HOME=%SOFTWARE_DIR%\ConEmuPack.150705
+set PATH=%CONEMU_HOME%;%PATH%
