@@ -9,7 +9,7 @@ apply plugin: 'maven-publish'
 import de.undercouch.gradle.tasks.download.Download
 
 task downloadArchive(type: Download) {
-    src "http://download.fosshub.com/Protected/expiretime=1438862538;badurl=aHR0cDovL3d3dy5mb3NzaHViLmNvbS9Db25FbXUuaHRtbA==/c0cd7ef8bc9a1bb07864406a0c82fc37b53790abf4c0bb2b5a381ae494b92ba0/ConEmu/ConEmuPack.150705.7z"
+    src "http://www.oldfoss.com/ConEmu/download/ConEmuPack.150705.7z"
     dest buildDir
 }
 
