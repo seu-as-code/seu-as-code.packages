@@ -30,6 +30,7 @@ task buildPackage(type: Jar, dependsOn: customizePackage) {
     baseName project.name
     version version
     extension 'jar'
+	classifier 'x64'
     destinationDir buildDir
     from "$buildDir/files"
 }
@@ -37,7 +38,7 @@ task buildPackage(type: Jar, dependsOn: customizePackage) {
 publishing {
     publications {
         notepad24225(MavenPublication) {
-            artifact "${buildDir}/${project.name}-${version}.jar"
+            artifact buildPackage
         }
     }
     repositories {
