@@ -1,0 +1,4 @@
+@echo off
+
+set ELASTICSEARCH_HOME=%SOFTWARE_DIR%\elasticsearch-1.7.1
+set PATH=%ELASTICSEARCH_HOME%\bin;%PATH%
