@@ -1,5 +1,5 @@
 -server
--Xms128m
+-Xms512m
 -Xmx1g
 -XX:MaxPermSize=250m
 -XX:ReservedCodeCacheSize=240m
