@@ -34,7 +34,7 @@ task buildPackage(type: Jar, dependsOn: customize) {
 publishing {
     publications {
 		intellij(MavenPublication) {
-			artifact "${buildDir}/${project.name}-${version}.jar"
+			artifact buildPackage
 		}
     }
 	repositories {

@@ -7,6 +7,6 @@ Scriptom.inApartment
 	def shortcut = wshShell.CreateShortcut("$seuHome\\intellij15.lnk")
 	shortcut.TargetPath = "${seuLayout.software}\\start-intellij-15.0.bat"
 	shortcut.IconLocation = "${seuLayout.software}\\intellij-15.0\\bin\\idea64.exe, 0"
-	shortcut.WorkingDirectory = "$seuHome\\software"
+	shortcut.WorkingDirectory = "${seuLayout.software}"
 	shortcut.Save()
 }
