@@ -10,12 +10,12 @@ apply plugin: 'maven-publish'
 import de.undercouch.gradle.tasks.download.Download
 
 task downloadArchive(type: Download) {
-    src "https://repository-master.mulesoft.org/nexus/content/repositories/releases/org/mule/distributions/mule-standalone/${version}/${name}-${version}.zip"
+    src "https://repository-master.mulesoft.org/nexus/content/repositories/releases/org/mule/distributions/${project.name}/${version}/${project.name}-${version}.zip"
     dest buildDir
 }
 
 task extractArchive(type: Copy, dependsOn: downloadArchive) {
-    from { zipTree("$buildDir/${name}-${version}.zip") }
+    from { zipTree("$buildDir/${project.name}-${version}.zip") }
     into "$buildDir/files"
 }
 
