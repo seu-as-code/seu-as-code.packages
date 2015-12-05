@@ -1,0 +1,53 @@
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'de.undercouch:gradle-download-task:2.0.0'
+    }
+}
+
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadArchive(type: Download) {
+    src "http://download.jetbrains.com/idea/ideaIU-${version}.win.zip"
+    dest buildDir
+}
+
+task extractArchive(type: Copy, dependsOn: downloadArchive) {
+    from { zipTree("$buildDir/ideaIU-${version}.win.zip") }
+    into "$buildDir/files/intellij-${version}"
+}
+
+task customize(type: Copy, dependsOn: extractArchive) {
+	from "files"
+	into "$buildDir/files"
+}
+
+task buildPackage(type: Jar, dependsOn: customize) {
+	baseName project.name
+	version version
+	extension 'jar'
+	destinationDir buildDir
+	from "$buildDir/files"
+}
+
+publishing {
+    publications {
+		intellij(MavenPublication) {
+			artifact "${buildDir}/${project.name}-${version}.jar"
+		}
+    }
+	repositories {
+		maven {  			
+			url 'https://www.qaware.de:443/nexus/content/repositories/qaware-seu/'
+			credentials {
+				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+			}			
+		}
+    }
+}
