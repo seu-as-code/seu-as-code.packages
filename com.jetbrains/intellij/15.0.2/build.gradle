@@ -36,18 +36,18 @@ task buildPackage(type: Jar, dependsOn: customize) {
 }
 
 publishing {
-    publications {
+  publications {
 		intellij(MavenPublication) {
 			artifact buildPackage
 		}
-    }
+  }
 	repositories {
-		maven {  			
-			url 'https://www.qaware.de:443/nexus/content/repositories/qaware-seu/'
+		maven {
+      url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
 			credentials {
 				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
 				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
-			}			
+			}
 		}
     }
 }
