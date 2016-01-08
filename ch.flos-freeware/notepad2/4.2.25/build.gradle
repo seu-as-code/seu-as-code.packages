@@ -17,8 +17,9 @@ task mkdirs << {
 	file("$buildDir/files/notepad2-4.2.25").mkdirs()
 }
 
-task extractArchive(type: Exec, dependsOn: [mkdirs, downloadArchive]) {
-    commandLine 'cmd', '/c', '7z.exe', 'x', "$buildDir/notepad2_4.2.25_x64.zip", "-o$buildDir/files/notepad2-4.2.25"
+task extractArchive(type: Copy, dependsOn: [mkdirs, downloadArchive]) {
+    from zipTree(file("$buildDir/notepad2_4.2.25_x64.zip"))
+    into file("$buildDir/files/notepad2-4.2.25")
 }
 
 task customizePackage(type: Copy, dependsOn: extractArchive) {
@@ -30,7 +31,7 @@ task buildPackage(type: Jar, dependsOn: customizePackage) {
     baseName project.name
     version version
     extension 'jar'
-	classifier 'x64'
+	  classifier 'x64'
     destinationDir buildDir
     from "$buildDir/files"
 }
@@ -57,27 +58,28 @@ bintray {
     user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
     key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
     publications = ['notepad24225']
-	publish = true
-	dryRun = false
+	  publish = true
+	  dryRun = false
+    
     pkg {
         repo = project.bintrayRepo
         name = project.name
-        desc = project.description		
+        desc = project.description
         licenses = ['BSD']
         labels = ['notepad2', 'editor', 'seu-as-code', 'package']
-		websiteUrl = project.websiteUrl
+		    websiteUrl = project.websiteUrl
         issueTrackerUrl = project.issueTrackerUrl
         vcsUrl = project.scmUrl
         publicDownloadNumbers = true
-        
+
         version {
             name = project.version
-			desc = "${project.description} ${project.version}"
-			released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
-			
-			mavenCentralSync {
-				sync = false
-			}
-        }	
+			      desc = "${project.description} ${project.version}"
+			      released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+
+      			mavenCentralSync {
+      				sync = false
+      			}
+        }
     }
 }
