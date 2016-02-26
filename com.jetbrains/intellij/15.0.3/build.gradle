@@ -30,6 +30,7 @@ task customize(type: Copy, dependsOn: extractArchive) {
 task buildPackage(type: Jar, dependsOn: customize) {
 	baseName project.name
 	version version
+  classifier 'win'
 	extension 'jar'
 	destinationDir buildDir
 	from "$buildDir/files"
