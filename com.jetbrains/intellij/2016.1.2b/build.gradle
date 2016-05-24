@@ -1,15 +1,20 @@
-apply plugin: 'base'
-apply plugin: 'maven-publish'
-
 buildscript {
     repositories {
         mavenCentral()
+		maven { 
+			url 'https://dl.bintray.com/seu-as-code/maven'
+		}
     }
     dependencies {
         classpath 'de.undercouch:gradle-download-task:2.0.0'
     }
 }
-
+plugins {
+    id 'de.qaware.seu.as.code.base' version '2.1.1'
+    id 'de.qaware.seu.as.code.credentials' version '2.0.1'
+}
+apply plugin: 'base'
+apply plugin: 'maven-publish'
 import de.undercouch.gradle.tasks.download.Download
 
 task downloadArchive(type: Download) {
@@ -46,8 +51,8 @@ publishing {
 		maven {
 			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
 			credentials {
-				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
-				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+				username = project.credentials.get('nexusUsername')
+				password = project.credentials.get('nexusPassword')
 			}
 		}
     }
