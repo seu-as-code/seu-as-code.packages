@@ -30,7 +30,7 @@ task customize(type: Copy, dependsOn: extractArchive) {
 task buildPackage(type: Jar, dependsOn: customize) {
 	baseName project.name
 	version version
-  classifier 'win'
+    classifier 'win'
 	extension 'jar'
 	destinationDir buildDir
 	from "$buildDir/files"
@@ -44,7 +44,7 @@ publishing {
   }
 	repositories {
 		maven {
-      url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
 			credentials {
 				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
 				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
