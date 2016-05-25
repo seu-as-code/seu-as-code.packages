@@ -3,6 +3,6 @@
 The package contains the Eclipse for RCP Developer release in version 4.4.0. Install this SEU-as-Code package using the following dependency:
 ```groovy
 dependencies {
-	software 'org.eclipse:eclipse-rcp-luna:4.4.0'
+	software 'org.eclipse:eclipse-rcp-luna:4.4.0:win'
 }
 ```
