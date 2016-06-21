@@ -1,6 +1,5 @@
-@echo off
 
-set GRADLE_HOME=%SOFTWARE_DIR%\gradle-2.13
-set GRADLE_OPTS=-Xmx4096M -Xms512M -Dfile.encoding=UTF-8
+export GRADLE_HOME=$SOFTWARE_DIR\gradle-2.13
+export GRADLE_OPTS=-Xmx4096M -Xms512M -Dfile.encoding=UTF-8
 
-set PATH=%GRADLE_HOME%\bin;%PATH%
+export PATH=$GRADLE_HOME%\bin:$PATH
