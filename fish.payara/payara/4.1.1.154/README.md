@@ -13,8 +13,8 @@ dependencies {
 ```
 
 ## Prerequisites
-Java EE 7 requires JDK 7 Update 65 or above, JDK 8u20 or above is recommended for P
-ayara Server 4.1.1.154.
+Java EE 7 requires JDK 7 Update 65 or above, JDK 8u20 or above is recommended for
+Payara Server 4.1.1.154.
 ```groovy
 dependencies {
 	software 'net.java:openjdk8:8u40'
