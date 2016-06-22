@@ -1,3 +1,3 @@
-# SEU-as-Code Base Packages
+# SEU-as-code Base Packages
 
-Contains the SEU-as-Code base packages. These are mandatory dependencies for every project.
+Contains the SEU-as-code base packages. These are mandatory dependencies for every project.

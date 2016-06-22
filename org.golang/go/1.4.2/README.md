@@ -1,6 +1,6 @@
 # Go 1.4.2
 
-The package contains the Go 1.4.2 distribution. Install this SEU-as-Code package using the following dependency:
+The package contains the Go 1.4.2 distribution. Install this SEU-as-code package using the following dependency:
 ```groovy
 dependencies {
 	// use this for the 32-bit version

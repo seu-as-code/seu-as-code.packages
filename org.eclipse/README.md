@@ -1,1 +1,1 @@
-# SEU-as-Code Packages for Eclipse Packages
+# SEU-as-code Packages for Eclipse Packages

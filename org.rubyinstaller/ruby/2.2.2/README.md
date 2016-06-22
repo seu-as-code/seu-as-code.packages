@@ -1,6 +1,6 @@
 # Ruby 2.2.2
 
-The package contains the Ruby 2.2.2 Installer for Windows. Install this SEU-as-Code package using the following dependency:
+The package contains the Ruby 2.2.2 Installer for Windows. Install this SEU-as-code package using the following dependency:
 ```groovy
 dependencies {
 	// use this for the 32-bit version
