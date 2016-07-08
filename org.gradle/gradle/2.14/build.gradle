@@ -24,29 +24,53 @@ apply plugin: 'maven-publish'
 
 import de.undercouch.gradle.tasks.download.Download
 
-task downloadArchive(type: Download) {
-	src "https://services.gradle.org/distributions/${project.name}-${version}-all.zip"
+task downloadArchiveBin(type: Download) {
+	src "https://services.gradle.org/distributions/${project.name}-${version}-bin.zip"
   dest "$buildDir"
 }
 
-task extractArchive(type: Copy, dependsOn: downloadArchive) {
-	from { zipTree("$buildDir/${project.name}-${version}-all.zip") }
-	into "$buildDir/files"
+task extractArchiveBin(type: Copy, dependsOn: downloadArchiveBin) {
+	from { zipTree("$buildDir/${project.name}-${version}-bin.zip") }
+	into "$buildDir/files/bin"
 }
 
-task buildPackage(type: Jar, dependsOn: extractArchive) {
+task buildPackageBin(type: Jar, dependsOn: extractArchiveBin) {
 	baseName project.name
 	version version
 	extension 'jar'
 	destinationDir buildDir
-	from "$buildDir/files"
+	from "$buildDir/files/bin"
 	from "files"
+}
+
+task downloadArchiveAll(type: Download) {
+	src "https://services.gradle.org/distributions/${project.name}-${version}-all.zip"
+  dest "$buildDir"
+}
+
+task extractArchiveAll(type: Copy, dependsOn: downloadArchiveAll) {
+	from { zipTree("$buildDir/${project.name}-${version}-all.zip") }
+	into "$buildDir/files/all"
+}
+
+task buildPackageAll(type: Jar, dependsOn: extractArchiveAll) {
+	baseName project.name
+	version version
+  classifier 'all'
+	extension 'jar'
+	destinationDir buildDir
+	from "$buildDir/files/all"
+	from "files"
+}
+
+task buildPackage(dependsOn: ['buildPackageBin', 'buildPackageDefaultAll']) {
 }
 
 publishing {
   publications {
 		gradle(MavenPublication) {
-			artifact "${buildDir}/${project.name}-${version}.jar"
+			artifact buildPackageBin
+      artifact buildPackageAll
 		}
   }
 	repositories {
@@ -77,7 +101,7 @@ bintray {
         issueTrackerUrl = project.issueTrackerUrl
         vcsUrl = project.scmUrl
         publicDownloadNumbers = true
-        
+
         version {
             name = project.version
       			desc = "${project.description} ${project.version}"
