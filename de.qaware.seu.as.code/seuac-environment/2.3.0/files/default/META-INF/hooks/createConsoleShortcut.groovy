@@ -1,7 +1,7 @@
 import org.codehaus.groovy.scriptom.*
-import de.qaware.seu.as.code.plugins.base.Platform
+import java.nio.file.*
 
-if (Platform.current() == Platform.Windows) {
+if (System.getProperty("os.name").toLowerCase().contains("windows")) {
 	Scriptom.inApartment
 	{
 			def wshShell = new ActiveXObject("WScript.Shell")
