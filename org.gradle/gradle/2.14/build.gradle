@@ -63,7 +63,7 @@ task buildPackageAll(type: Jar, dependsOn: extractArchiveAll) {
 	from "files"
 }
 
-task buildPackage(dependsOn: ['buildPackageBin', 'buildPackageDefaultAll']) {
+task buildPackage(dependsOn: ['buildPackageBin', 'buildPackageAll']) {
 }
 
 publishing {
