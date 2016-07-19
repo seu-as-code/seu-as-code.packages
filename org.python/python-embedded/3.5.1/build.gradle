@@ -27,6 +27,7 @@ task customizePackage(type: Copy, dependsOn: extractArchive) {
 task buildPackage(type: Jar, dependsOn: customizePackage) {
 	baseName project.name
 	version version
+	classifier 'win'
 	extension 'jar'
 	destinationDir buildDir
 	from "$buildDir/files"
@@ -35,7 +36,7 @@ task buildPackage(type: Jar, dependsOn: customizePackage) {
 publishing {
     publications {
 		python351(MavenPublication) {
-			artifact "${buildDir}/${project.name}-${version}.jar"
+			artifact "${buildDir}/${project.name}-${version}-win.jar"
 		}
     }
 	repositories {
