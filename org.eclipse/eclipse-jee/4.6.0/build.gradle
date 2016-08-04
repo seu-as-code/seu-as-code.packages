@@ -13,11 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
 buildscript {
 	repositories {
 	   mavenCentral()
-		maven { 
+		maven {
 			url 'https://dl.bintray.com/seu-as-code/maven'
 		}
 	}
@@ -25,7 +25,7 @@ buildscript {
 	   classpath 'de.undercouch:gradle-download-task:2.0.0'
 	}
 }
- 
+
 plugins {
 	id 'de.undercouch.download' version '1.2'
 	id 'de.qaware.seu.as.code.base' version '2.1.1'
@@ -42,7 +42,7 @@ task downloadArchive(type: Download) {
     dest buildDir
 }
 
-task extractArchive(type: Copy, dependsOn: downloadArchive) {	
+task extractArchive(type: Copy, dependsOn: downloadArchive) {
 	from { zipTree("$buildDir/eclipse-jee-neon-R-win32-x86_64.zip") }
 	into "$buildDir/files"
 	doLast{
@@ -70,18 +70,18 @@ task wrapper(type: Wrapper) {
 
 publishing {
     publications {
-		maven(MavenPublication) {
-			artifact buildPackage
-		}
+  		eclipse(MavenPublication) {
+  			artifact buildPackage
+  		}
     }
 	repositories {
 		// set the properties via -P to publish to your company repo
-		maven {  			
+		maven {
 			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
 			credentials {
 				username = project.credentials.get('nexusUsername')
                 password = project.credentials.get('nexusPassword')
-			}			
+			}
 		}
     }
 }
