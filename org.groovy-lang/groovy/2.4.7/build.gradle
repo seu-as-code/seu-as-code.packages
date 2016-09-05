@@ -34,17 +34,7 @@ task extractArchive(type: Copy, dependsOn: downloadArchive) {
 	  into "$buildDir/files"
 }
 
-task downloadScriptom(type: Download) {
-	  src "http://mirrors.ibiblio.org/maven2/org/codehaus/groovy/modules/scriptom/scriptom-all-assembly/1.6.0/scriptom-all-assembly-1.6.0.zip"
-    dest "$buildDir"
-}
-
-task extractScriptom(type: Copy, dependsOn: [downloadScriptom, extractArchive]) {
-	  from { zipTree("$buildDir/scriptom-all-assembly-1.6.0.zip") }
-	  into "$buildDir/files/${project.name}-${version}/"
-}
-
-task buildPackage(type: Jar, dependsOn: extractScriptom) {
+task buildPackage(type: Jar, dependsOn: extractArchive) {
 	  baseName project.name
 	  version version
 	  extension 'jar'
