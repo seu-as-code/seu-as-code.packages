@@ -1,0 +1,3 @@
+
+export JRUBY_HOME=$SOFTWARE_DIR/jruby-9.1.4.0
+export PATH=$JRUBY_HOME/bin:$PATH
