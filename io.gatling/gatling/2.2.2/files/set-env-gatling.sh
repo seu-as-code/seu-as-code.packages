@@ -1,0 +1,3 @@
+
+export GATLING_HOME=$SOFTWARE_DIR/gatling-2.2.2
+export PATH=$GATLING_HOME/bin:$PATH
