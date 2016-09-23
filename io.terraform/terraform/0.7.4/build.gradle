@@ -3,6 +3,7 @@ plugins {
     id 'com.jfrog.bintray' version '1.2'
 }
 
+apply plugin: 'base'
 apply plugin: 'maven-publish'
 
 import de.undercouch.gradle.tasks.download.Download
