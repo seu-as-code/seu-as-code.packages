@@ -1,0 +1,5 @@
+@echo off
+
+set TERRAFORM_HOME=%SOFTWARE_DIR%\terraform-0.7.4
+
+set PATH=%TERRAFORM_HOME%;%PATH%
