@@ -9,8 +9,7 @@ buildscript {
         classpath 'de.undercouch:gradle-download-task:2.0.0'
     }
 }
-plugins {
-    id 'de.qaware.seu.as.code.base' version '2.1.1'
+plugins {    
     id 'de.qaware.seu.as.code.credentials' version '2.4.0'
 }
 apply plugin: 'base'
@@ -50,9 +49,15 @@ publishing {
 	repositories {
 		maven {
 			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
-			credentials {
-				username = project.credentials.get('nexus').username
-				password = project.credentials.get('nexus').password
+			credentials {	
+				if(project.credentials.get("nexus")!=null){
+					username = project.credentials.get('nexus').username
+					password = project.credentials.get('nexus').password
+				}
+				else {
+					username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+					password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+				} 					
 			}
 		}
     }
