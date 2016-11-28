@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        mavenCentral()
+		maven { 
+			url 'https://dl.bintray.com/seu-as-code/maven'
+		}
+    }
+    dependencies {
+        classpath 'de.undercouch:gradle-download-task:2.0.0'
+    }
+}
+plugins {    
+    id 'de.qaware.seu.as.code.credentials' version '2.4.0'
+}
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadArchive(type: Download) {
+    src "http://download.jetbrains.com/idea/ideaIU-${version}.win.zip"
+    dest buildDir
+}
+
+task extractArchive(type: Copy, dependsOn: downloadArchive) {
+    from { zipTree("$buildDir/ideaIU-${version}.win.zip") }
+    into "$buildDir/files/intellij-${version}"
+}
+
+task customize(type: Copy, dependsOn: extractArchive) {
+	from "files"
+	into "$buildDir/files"
+}
+
+task buildPackage(type: Jar, dependsOn: customize) {
+	baseName project.name
+	version version
+    classifier 'win'
+	extension 'jar'
+	destinationDir buildDir
+	from "$buildDir/files"
+}
+
+publishing {
+  publications {
+		intellij(MavenPublication) {
+			artifact buildPackage
+		}
+  }
+	repositories {
+		maven {
+			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+			credentials {	
+				if(project.credentials.get("nexus")!=null){
+					username = project.credentials.get('nexus').username
+					password = project.credentials.get('nexus').password
+				}
+				else {
+					username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+					password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+				} 					
+			}
+		}
+    }
+}
