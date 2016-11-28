@@ -11,7 +11,7 @@ buildscript {
 }
 plugins {
     id 'de.qaware.seu.as.code.base' version '2.1.1'
-    id 'de.qaware.seu.as.code.credentials' version '2.0.1'
+    id 'de.qaware.seu.as.code.credentials' version '2.4.0'
 }
 apply plugin: 'base'
 apply plugin: 'maven-publish'
@@ -51,8 +51,8 @@ publishing {
 		maven {
 			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
 			credentials {
-				username = project.credentials.get('nexusUsername')
-				password = project.credentials.get('nexusPassword')
+				username = project.credentials.get('nexus').username
+				password = project.credentials.get('nexus').password
 			}
 		}
     }
