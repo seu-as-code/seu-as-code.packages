@@ -22,6 +22,8 @@ set JDK_HOME=%JAVA_HOME%
 set JRE_HOME=%JAVA_HOME%\\jre
 
 set M2_HOME=%MAVEN_HOME%
+set M3_HOME=%MAVEN_HOME%
 set M2_REPO=%SEU_HOME%\\repository
+set M3_REPO=%SEU_HOME%\\repository
 
 set PATH=%JAVA_HOME%\\bin;%PATH%
