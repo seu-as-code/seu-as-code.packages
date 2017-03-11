@@ -1,0 +1,2 @@
+export ITERM2_HOME=$SOFTWARE_DIR/iTerm2-3.0.14
+

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+. $(dirname $0)/set-env.sh
+
+cd $ITERM2_HOME
+
+nohup ./iTerm.app/Contents/MacOS/iTerm2 >>/dev/null 2>>/dev/null &
+
