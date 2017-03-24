@@ -22,14 +22,15 @@ task downloadArchive(type: Download) {
 }
 
 task mountImage(type:Exec, dependsOn: downloadArchive) {
-  commandLine "hdiutil attach $buildDir/ideaIU-${version}.dmg -mountpoint $buildDir/files/intellij-${version}"
+  executable "/usr/bin/hdiutil"
+  args "mount", "$buildDir/ideaIU-${version}.dmg"
 }
 
-task unmountImage(type:Exec, dependsOn: downloadArchive) {
-  commandLine "hdiutil dettach $buildDir/files/intellij-${version}"
+task copyApp(type: Copy, dependsOn: mountImage) {
+	from '/Volumes/IntelliJ IDEA/IntelliJ IDEA.app'
+	into "$buildDir/files/IntelliJ IDEA.app"
 }
-
-task customize(type: Copy, dependsOn: mountImage) {
+task customize(type: Copy, dependsOn: copyApp) {
 	from "files"
 	into "$buildDir/files"
 }
@@ -42,7 +43,6 @@ task buildPackage(type: Jar, dependsOn: customize) {
 	destinationDir buildDir
 	from "$buildDir/files"
 }
-buildPackage.finalizedBy 'unmountImage'
 
 publishing {
   publications {
