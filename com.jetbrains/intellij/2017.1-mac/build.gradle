@@ -22,12 +22,17 @@ task downloadArchive(type: Download) {
 }
 
 task mountImage(type:Exec, dependsOn: downloadArchive) {
-  executable "/usr/bin/hdiutil"
-  args "mount", "$buildDir/ideaIU-${version}.dmg"
+	executable "sh"
+	args "-c", "/usr/bin/hdiutil mount $buildDir/ideaIU-${version}.dmg | tail -1 | awk '{\$1=\$2=\"\"; print \$0}'"
+   	standardOutput = new ByteArrayOutputStream()
+	ext.output = {
+		return standardOutput.toString().trim()
+	}
+	
 }
 
 task copyApp(type: Copy, dependsOn: mountImage) {
-	from '/Volumes/IntelliJ IDEA/IntelliJ IDEA.app'
+	from { "${mountImage.output()}/IntelliJ IDEA.app" }
 	into "$buildDir/files/IntelliJ IDEA.app"
 }
 task customize(type: Copy, dependsOn: copyApp) {
@@ -42,6 +47,16 @@ task buildPackage(type: Jar, dependsOn: customize) {
 	extension 'jar'
 	destinationDir buildDir
 	from "$buildDir/files"
+}
+buildPackage.finalizedBy 'unmountImage'
+
+task unmountImage() {
+	doFirst{
+		exec{
+			executable "/usr/bin/hdiutil"
+			args "unmount", "${mountImage.output()}"
+		}
+	}
 }
 
 publishing {
