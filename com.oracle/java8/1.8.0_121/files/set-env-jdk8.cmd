@@ -1,0 +1,4 @@
+@echo off
+
+set JAVA8_HOME=%SOFTWARE_DIR%\jdk1.8.0_121
+set JRE8_HOME=%JAVA8_HOME%\jre
