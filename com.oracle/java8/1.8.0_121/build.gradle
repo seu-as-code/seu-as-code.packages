@@ -17,7 +17,7 @@ apply plugin: 'base'
 apply plugin: 'maven-publish'
 platform{
 	win {
-		ext.baseDir="${env.ProgramFiles}/Java/jdk${version}"
+		ext.baseDir="${System.env.ProgramFiles}/Java/jdk${version}"
 	}
 	mac {
 		ext.baseDir="/Library/Java/JavaVirtualMachines/jdk${version}.jdk/Contents/Home"
