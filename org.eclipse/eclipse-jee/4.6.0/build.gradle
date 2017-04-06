@@ -37,31 +37,61 @@ apply plugin: 'maven-publish'
 
 import de.undercouch.gradle.tasks.download.Download
 
-task downloadArchive(type: Download) {
-	src "http://mirror.switch.ch/eclipse/technology/epp/downloads/release/neon/R/eclipse-jee-neon-R-win32-x86_64.zip"
+task downloadArchiveWin64(type: Download) {
+	src "${downloadBaseUrl}${fileName64bit}"
     dest buildDir
 }
+task downloadArchiveWin32(type: Download) {
+	src "${downloadBaseUrl}${fileName32bit}"
+	dest buildDir
+}
 
-task extractArchive(type: Copy, dependsOn: downloadArchive) {
-	from { zipTree("$buildDir/eclipse-jee-neon-R-win32-x86_64.zip") }
-	into "$buildDir/files"
+task extractArchiveWin64(type: Copy, dependsOn: downloadArchiveWin64) {
+	from { zipTree("$buildDir/${fileName64bit}") }
+	into "$buildDir/files/win64"
 	doLast{
-		file("$buildDir/files/eclipse").renameTo(file("$buildDir/files/eclipse-jee-neon"))
+		file("$buildDir/files/win64/eclipse").renameTo(file("$buildDir/files/win64/eclipse-jee-neon"))
 	}
 }
 
-task customizePackage(type: Copy, dependsOn: extractArchive) {
-	from "files"
-	into "$buildDir/files"
+task extractArchiveWin32(type: Copy, dependsOn: downloadArchiveWin32) {
+	from { zipTree("$buildDir/${fileName32bit}") }
+	into "$buildDir/files/win32"
+	doLast{
+		file("$buildDir/files/win32/eclipse").renameTo(file("$buildDir/files/win32/eclipse-jee-neon"))
+	}
 }
 
-task buildPackage(type: Jar, dependsOn: customizePackage) {
+task customizePackageWin64(type: Copy, dependsOn: extractArchiveWin64) {
+	from "files"
+	into "$buildDir/files/win64"
+}
+
+task customizePackageWin32(type: Copy, dependsOn: extractArchiveWin32) {
+	from "files"
+	into "$buildDir/files/win32"
+}
+
+task buildPackageWin64(type: Jar, dependsOn: customizePackageWin64) {
 	baseName "eclipse-jee-neon"
 	version version
 	classifier 'win'
 	extension 'jar'
 	destinationDir buildDir
-	from "$buildDir/files"
+	from "$buildDir/files/win64"
+}
+
+task buildPackageWin32(type: Jar, dependsOn: customizePackageWin32) {
+	baseName "eclipse-jee-neon-32"
+	version version
+	classifier 'win'
+	extension 'jar'
+	destinationDir buildDir
+	from "$buildDir/files/win32"
+}
+
+task buildPackage(dependsOn: ['buildPackageWin64',
+							  'buildPackageWin32']) {
 }
 
 task wrapper(type: Wrapper) {
@@ -70,8 +100,12 @@ task wrapper(type: Wrapper) {
 
 publishing {
     publications {
-  		eclipse(MavenPublication) {
-  			artifact buildPackage
+        eclipse64(MavenPublication) {
+            artifact buildPackageWin64
+        }
+		eclipse32(MavenPublication) {
+            artifactId "${project.name}-32"
+            artifact buildPackageWin32
   		}
     }
 	repositories {
