@@ -1,0 +1,83 @@
+buildscript {
+    repositories {
+        mavenCentral()
+		maven { 
+			url 'https://dl.bintray.com/seu-as-code/maven'
+		}
+    }
+    dependencies {
+        classpath 'de.undercouch:gradle-download-task:2.0.0'
+    }
+}
+plugins {    
+    id 'de.qaware.seu.as.code.credentials' version '2.4.0'
+}
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadArchive(type: Download) {
+    src "http://download.jetbrains.com/idea/ideaIU-${version}.dmg"
+    dest buildDir
+}
+
+task mountImage(type:Exec, dependsOn: downloadArchive) {
+	executable "sh"
+	args "-c", "/usr/bin/hdiutil mount $buildDir/ideaIU-${version}.dmg | tail -1 | awk '{\$1=\$2=\"\"; print \$0}'"
+   	standardOutput = new ByteArrayOutputStream()
+	ext.output = {
+		return standardOutput.toString().trim()
+	}
+	
+}
+
+task copyApp(type: Copy, dependsOn: mountImage) {
+	from { "${mountImage.output()}/IntelliJ IDEA.app" }
+	into "$buildDir/files/IntelliJ IDEA.app"
+}
+task customize(type: Copy, dependsOn: copyApp) {
+	from "files"
+	into "$buildDir/files"
+}
+
+task buildPackage(type: Jar, dependsOn: customize) {
+	baseName project.name
+	version version
+    classifier 'mac'
+	extension 'jar'
+	destinationDir buildDir
+	from "$buildDir/files"
+}
+buildPackage.finalizedBy 'unmountImage'
+
+task unmountImage() {
+	doFirst{
+		exec{
+			executable "/usr/bin/hdiutil"
+			args "unmount", "${mountImage.output()}"
+		}
+	}
+}
+
+publishing {
+  publications {
+		intellij(MavenPublication) {
+			artifact buildPackage
+		}
+  }
+	repositories {
+		maven {
+			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+			credentials {	
+				if(project.credentials.get("nexus")!=null){
+					username = project.credentials.get('nexus').username
+					password = project.credentials.get('nexus').password
+				}
+				else {
+					username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+					password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+				} 					
+			}
+		}
+    }
+}
