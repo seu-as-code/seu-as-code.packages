@@ -34,7 +34,13 @@ task extractArchive(type: Copy, dependsOn: downloadArchive) {
 	into "$buildDir/files"
 }
 
-task customizePackage(type: Copy, dependsOn: extractArchive) {
+task renameDirectory(dependsOn: extractArchive) {
+    doLast {
+        file("$buildDir/files/${project.name}-${version}-bin").renameTo(file("$buildDir/files/${project.name}-${version}"))
+    }
+}
+
+task customizePackage(type: Copy, dependsOn: renameDirectory) {
 	from "files"
 	into "$buildDir/files"
 }
