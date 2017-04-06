@@ -1,5 +1,5 @@
 /*
- *    Copyright (C) 2015 QAware GmbH
+ *    Copyright (C) 2017 QAware GmbH
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -79,8 +79,8 @@ bintray {
     repo = project.bintrayRepo
     name = project.name
     desc = project.description
-    licenses = ['Apache-2.0']
-    labels = ['apache-maven', 'seu-as-code', 'package']
+    licenses = ['GPLv2']
+    labels = ['iterm2', 'seu-as-code', 'package']
     websiteUrl = project.websiteUrl
     issueTrackerUrl = project.issueTrackerUrl
     vcsUrl = project.scmUrl
