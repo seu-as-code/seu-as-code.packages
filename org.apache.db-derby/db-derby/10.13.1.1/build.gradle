@@ -59,7 +59,7 @@ task wrapper(type: Wrapper) {
 
 publishing {
     publications {
-  		maven(MavenPublication) {
+  		derby(MavenPublication) {
   			artifact "${buildDir}/${project.name}-${version}.jar"
   		}
     }
@@ -78,7 +78,7 @@ publishing {
 bintray {
   user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
   key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
-  publications = ['maven']
+  publications = ['derby']
 	publish = true
 	dryRun = false
   pkg {
@@ -86,7 +86,7 @@ bintray {
     name = project.name
     desc = project.description
     licenses = ['Apache-2.0']
-    labels = ['apache-maven', 'seu-as-code', 'package']
+    labels = ['derby-db', 'seu-as-code', 'package']
     websiteUrl = project.websiteUrl
     issueTrackerUrl = project.issueTrackerUrl
     vcsUrl = project.scmUrl
