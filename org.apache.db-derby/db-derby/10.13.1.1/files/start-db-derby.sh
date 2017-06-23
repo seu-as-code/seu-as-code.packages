@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-./set-env-db-derby.sh
+source $(dirname $0)/set-env.sh
 
 cd $DERBY_HOME
 
