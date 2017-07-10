@@ -16,6 +16,7 @@
 
 plugins {
 	id 'com.jfrog.bintray' version '1.2'
+  id 'de.qaware.seu.as.code.credentials' version '2.4.0'
 }
 
 apply plugin: 'base'
@@ -102,14 +103,21 @@ publishing {
   }
 	repositories {
 		// set the properties via -P to publish to your company repo
+    // set the properties via -P to publish to your company repo
 		maven {
 			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
-			credentials {
-				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
-				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
-			}
+      credentials {
+				if(project.credentials.get("nexus") != null){
+					username = project.credentials.get('nexus').username
+					password = project.credentials.get('nexus').password
+				}
+				else {
+					username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+					password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+				}
+		  }
 		}
- }
+  }
 }
 
 bintray {
