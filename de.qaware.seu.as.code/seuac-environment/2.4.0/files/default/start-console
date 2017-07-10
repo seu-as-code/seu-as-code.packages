@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+. $(dirname $0)/set-env.sh
+
+cd $SEU_HOME
+bash --rcfile $HOME/.bashrc -i
