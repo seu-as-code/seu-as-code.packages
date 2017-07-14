@@ -1,0 +1,4 @@
+
+export KOMPOSE_HOME=$SOFTWARE_DIR/kompose-0.7.0
+
+export PATH=$KOMPOSE_HOME:$PATH
