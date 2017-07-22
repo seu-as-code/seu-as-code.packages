@@ -52,15 +52,19 @@ task buildPackageWin(type: Jar, dependsOn: extractArchiveWin) {
 
 task downloadArchiveMac(type: Download) {
 	src "https://github.com/minishift/minishift/releases/download/v${version}/minishift-${version}-darwin-amd64.tgz"
-  dest "$buildDir"
+  dest "$buildDir/mac/minishift-${version}/minishift-${version}-darwin-amd64.tgz"
 }
 
-task extractArchiveMac(type: Copy, dependsOn: downloadArchiveMac) {
-  from { zipTree("$buildDir/minishift-${version}-darwin-amd64.tgz") }
-  into "$buildDir/mac/minishift-${version}/"
+task extractArchiveMac(type: Exec, dependsOn: downloadArchiveMac) {
+  workingDir "$buildDir/mac/minishift-${version}/"
+  commandLine 'tar', 'xzf', "minishift-${version}-darwin-amd64.tgz"
 }
 
-task buildPackageMac(type: Jar, dependsOn: extractArchiveMac) {
+task deleteArchiveMac(type: Delete, dependsOn: extractArchiveMac) {
+  delete "$buildDir/mac/minishift-${version}/minishift-${version}-darwin-amd64.tgz"
+}
+
+task buildPackageMac(type: Jar, dependsOn: deleteArchiveMac) {
 	baseName project.name
 	version version
   classifier 'mac'
@@ -75,15 +79,19 @@ task buildPackageMac(type: Jar, dependsOn: extractArchiveMac) {
 
 task downloadArchiveUnix(type: Download) {
 	src "https://github.com/minishift/minishift/releases/download/v${version}/minishift-${version}-linux-amd64.tgz"
-  dest "$buildDir"
+  dest "$buildDir/unix/minishift-${version}/minishift-${version}-linux-amd64.tgz"
 }
 
-task extractArchiveUnix(type: Copy, dependsOn: downloadArchiveUnix) {
-  from { zipTree("$buildDir/minishift-${version}-linux-amd64.tgz") }
-  into "$buildDir/unix/minishift-${version}/"
+task extractArchiveUnix(type: Exec, dependsOn: downloadArchiveUnix) {
+  workingDir "$buildDir/unix/minishift-${version}/"
+  commandLine 'tar', 'xzf', "minishift-${version}-linux-amd64.tgz"
 }
 
-task buildPackageUnix(type: Jar, dependsOn: extractArchiveUnix) {
+task deleteArchiveUnix(type: Delete, dependsOn: extractArchiveUnix) {
+  delete "$buildDir/unix/minishift-${version}/minishift-${version}-linux-amd64.tgz"
+}
+
+task buildPackageUnix(type: Jar, dependsOn: deleteArchiveUnix) {
 	baseName project.name
 	version version
   classifier 'unix'
