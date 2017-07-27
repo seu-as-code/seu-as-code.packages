@@ -25,7 +25,7 @@ apply plugin: 'maven-publish'
 
 import de.undercouch.gradle.tasks.download.Download
 
-task buildPackage(dependsOn: ['buildPackageWin', 'buildPackageUnix']) { }
+task buildPackage(dependsOn: ['buildPackageWin', 'buildPackageUnix', 'buildPackageMac']) { }
 
 task downloadArchiveWin(type: Download) {
 	src "https://nodejs.org/dist/v${project.version}/node-v${project.version}-win-x64.zip"
@@ -82,7 +82,7 @@ task extractArchiveMac(type: Exec, dependsOn: downloadArchiveMac) {
 }
 
 task deleteArchiveMac(type: Delete, dependsOn: extractArchiveMac) {
-  delete "$buildDir/unix/node-v${project.version}-darwin-x64.tar.gz"
+  delete "$buildDir/mac/node-v${project.version}-darwin-x64.tar.gz"
 }
 
 task buildPackageMac(type: Jar, dependsOn: deleteArchiveMac) {
