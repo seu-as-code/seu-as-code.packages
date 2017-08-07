@@ -1,0 +1,137 @@
+/*
+ *    Copyright (C) 2015 QAware GmbH
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+plugins {
+  id 'de.undercouch.download' version '3.2.0'
+	id 'com.jfrog.bintray' version '1.2'
+  id 'de.qaware.seu.as.code.credentials' version '2.4.0'
+}
+
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+import de.undercouch.gradle.tasks.download.Download
+
+task buildPackage(dependsOn: ['buildPackageWin', 'buildPackageMac', 'buildPackageUnix']) { }
+
+task downloadArchiveWin(type: Download) {
+	src "https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/windows/amd64/kubectl.exe"
+  dest new File("$buildDir/win/kubectl-${version}", 'kubectl.exe')
+}
+
+task buildPackageWin(type: Jar, dependsOn: downloadArchiveWin) {
+	baseName project.name
+	version version
+  classifier 'win'
+	extension 'jar'
+	destinationDir buildDir
+  from "$buildDir/win"
+	from ("files/") {
+    include '*.cmd'
+    include '*.bat'
+  }
+}
+
+task downloadArchiveMac(type: Download) {
+	src "https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/darwin/amd64/kubectl"
+  dest new File("$buildDir/mac/kubectl-${version}", 'kubectl')
+}
+
+task buildPackageMac(type: Jar, dependsOn: downloadArchiveMac) {
+	baseName project.name
+	version version
+  classifier 'mac'
+	extension 'jar'
+	destinationDir buildDir
+  from "$buildDir/mac"
+	from ("files/") {
+    exclude '*.cmd'
+    exclude '*.bat'
+  }
+}
+
+task downloadArchiveUnix(type: Download) {
+	src "https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/linux/amd64/kubectl"
+  dest new File("$buildDir/unix/kubectl-${version}", 'kubectl')
+}
+
+task buildPackageUnix(type: Jar, dependsOn: downloadArchiveUnix) {
+	baseName project.name
+	version version
+  classifier 'unix'
+	extension 'jar'
+	destinationDir buildDir
+  from "$buildDir/unix"
+	from ("files/") {
+    exclude '*.cmd'
+    exclude '*.bat'
+  }
+}
+
+publishing {
+  publications {
+		minikube(MavenPublication) {
+      artifact buildPackageWin
+      artifact buildPackageMac
+      artifact buildPackageUnix
+		}
+  }
+	repositories {
+    // set the properties via -P to publish to your company repo
+		maven {
+			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+      credentials {
+				if(project.credentials.get("nexus") != null){
+					username = project.credentials.get('nexus').username
+					password = project.credentials.get('nexus').password
+				}
+				else {
+					username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+					password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+				}
+		  }
+		}
+  }
+}
+
+bintray {
+  user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
+  key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
+  publications = ['minikube']
+	publish = true
+	dryRun = false
+  pkg {
+    repo = project.bintrayRepo
+    name = project.name
+    desc = project.description
+    licenses = ['Apache-2.0']
+    labels = ['kubectl', 'kubernetes', 'seu-as-code', 'package']
+    websiteUrl = project.websiteUrl
+    issueTrackerUrl = project.issueTrackerUrl
+    vcsUrl = project.scmUrl
+    publicDownloadNumbers = true
+
+    version {
+      name = project.version
+  		desc = "${project.description} ${project.version}"
+  		released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+
+  		mavenCentralSync {
+  			sync = false
+  		}
+    }
+  }
+}
