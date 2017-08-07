@@ -1,0 +1,6 @@
+
+export MINISHIFT_HOME=$SOFTWARE_DIR/minikube-0.21.0
+
+chmod +x $MINISHIFT_HOME/minikube
+
+export PATH=$MINISHIFT_HOME:$PATH
