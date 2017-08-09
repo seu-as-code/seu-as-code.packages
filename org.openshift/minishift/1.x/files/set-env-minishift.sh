@@ -1,5 +1,5 @@
 
-export MINISHIFT_HOME=$SOFTWARE_DIR/minishift-1.3.1
+export MINISHIFT_HOME=$SOFTWARE_DIR/minishift-1.4.1
 
 chmod +x $MINISHIFT_HOME/minishift
 

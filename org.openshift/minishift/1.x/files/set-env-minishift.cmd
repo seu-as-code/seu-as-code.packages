@@ -1,5 +1,5 @@
 @echo off
 
-set MINISHIFT_HOME=%SOFTWARE_DIR%\minishift-1.3.1
+set MINISHIFT_HOME=%SOFTWARE_DIR%\minishift-1.4.1
 
 set PATH=%MINISHIFT_HOME%;%PATH%
