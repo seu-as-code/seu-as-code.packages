@@ -30,6 +30,7 @@ task buildPackage(type: Jar, dependsOn: customizePackage) {
     baseName project.name
     version version
     extension 'jar'
+    classifier 'win'
     destinationDir buildDir
     from "$buildDir/files"
 }
