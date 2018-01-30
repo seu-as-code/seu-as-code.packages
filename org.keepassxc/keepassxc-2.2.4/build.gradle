@@ -1,0 +1,148 @@
+/*
+ *    Copyright (C) 2018 QAware GmbH
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+plugins {
+  id 'de.undercouch.download' version '3.2.0'
+  id 'com.jfrog.bintray' version '1.2'
+  id 'de.qaware.seu.as.code.credentials' version '2.4.0'
+}
+
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+import de.undercouch.gradle.tasks.download.Download
+
+task buildPackage(dependsOn: ['buildPackageWin', 'buildPackageMac']) { }
+
+task downloadArchiveWin(type: Download) {
+  src "https://github.com/keepassxreboot/keepassxc/releases/download/${version}/KeePassXC-${version}-Win64-Portable.zip"
+  dest buildDir
+}
+task extractArchiveWin(type: Copy, dependsOn: downloadArchiveWin) {
+    from { zipTree("${buildDir}/KeePassXC-${version}-Win64-Portable.zip") }
+    into "$buildDir/win/"
+}
+
+task buildPackageWin(type: Jar, dependsOn: extractArchiveWin) {
+  baseName project.name
+  version version
+  classifier 'win'
+  extension 'jar'
+  destinationDir buildDir
+  from "$buildDir/win"
+  from ("files/") {
+    include '*.cmd'
+    include '*.bat'
+  }
+}
+
+task downloadArchiveMac(type: Download) {
+  src "https://github.com/keepassxreboot/keepassxc/releases/download/${version}/KeePassXC-${version}-2.dmg"
+  dest buildDir
+}
+
+task mountImageMac(type:Exec, dependsOn: downloadArchiveMac) {
+	executable "sh"
+	args "-c", "/usr/bin/hdiutil mount $buildDir/KeePassXC-${version}-2.dmg | tail -1 | awk '{\$1=\$2=\"\"; print \$0}'"
+   	standardOutput = new ByteArrayOutputStream()
+	ext.output = {
+		return standardOutput.toString().trim()
+	}
+}
+
+task copyAppMac(type: Copy, dependsOn: mountImageMac) {
+	from { "${mountImageMac.output()}/KeePassXC.app" }
+	into "$buildDir/mac/KeePassXC.app"
+}
+
+task buildPackageMac(type: Jar, dependsOn: copyAppMac) {
+  baseName project.name
+  version version
+  classifier 'mac'
+  extension 'jar'
+  destinationDir buildDir
+  from "$buildDir/mac"
+  from ("files/") {
+    exclude '*.cmd'
+    exclude '*.bat'
+  }
+}
+
+task unmountImageMac() {
+	doFirst{
+		exec{
+			executable "/usr/bin/hdiutil"
+			args "unmount", "${mountImageMac.output()}"
+		}
+	}
+}
+buildPackageMac.finalizedBy 'unmountImageMac'
+
+publishing {
+  publications {
+    keepassxc(MavenPublication) {
+      artifact buildPackageWin
+      artifact buildPackageMac
+    }
+  }
+  repositories {
+    // set the properties via -P to publish to your company repo
+    maven {
+      url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+      credentials {
+        if(project.credentials.get("nexus") != null){
+          username = project.credentials.get('nexus').username
+          password = project.credentials.get('nexus').password
+        }
+        else {
+          username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+          password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+        }
+      }
+    }
+  }
+}
+
+bintray {
+  user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
+  key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
+  publications = ['keepassxc']
+  publish = true
+  dryRun = false
+  pkg {
+    repo = project.bintrayRepo
+    name = project.name
+    desc = project.description
+    licenses = ['Apache-2.0']
+    labels = ['keepass', 'keepassxc', 'seu-as-code', 'package']
+    websiteUrl = project.websiteUrl
+    issueTrackerUrl = project.issueTrackerUrl
+    vcsUrl = project.scmUrl
+    publicDownloadNumbers = true
+
+    version {
+      name = project.version
+      desc = "${project.description} ${project.version}"
+      released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+
+      mavenCentralSync {
+        sync = false
+      }
+    }
+  }
+}
+
+
