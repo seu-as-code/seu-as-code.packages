@@ -38,7 +38,7 @@ task buildPackage(type: Jar, dependsOn: customizePackage) {
 publishing {
     publications {
         conemu180114(MavenPublication) {
-            artifact "${buildDir}/${project.name}-${version}.jar"
+            artifact "${buildDir}/${project.name}-${version}-win.jar"
         }
     }
     repositories {
