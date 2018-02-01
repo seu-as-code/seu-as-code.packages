@@ -1,0 +1,2 @@
+files/*.sh eol=lf
+files/*.cmd eol=crlf

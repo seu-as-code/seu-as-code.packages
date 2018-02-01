@@ -1,2 +1,0 @@
-export JAVA8_HOME=$SOFTWARE_DIR/openjdk8
-export JRE8_HOME=$JAVA8_HOME/jre

@@ -23,27 +23,27 @@ apply plugin: 'base'
 apply plugin: 'maven-publish'
 
 import de.undercouch.gradle.tasks.download.Download
+import org.apache.tools.ant.filters.ReplaceTokens
 
-task buildPackage(dependsOn: ['buildPackageWin']) {}
+task buildPackage(dependsOn: ['buildPackageWin','buildPackageMac', 'buildPackageLinux']) {}
 
 task downloadArchiveWin(type: Download) {
-    src "https://github.com/ojdkbuild/ojdkbuild/releases/download/${version}/java-1.8.0-openjdk-${version}.${buildVersion}.ojdkbuild.windows.x86_64.zip"
+    src "https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk${version}/OpenJDK8_x64_Win_jdk${version}.zip"
     dest buildDir
 }
 
 task extractArchiveWin(type: Copy, dependsOn: downloadArchiveWin) {
-    from { zipTree("$buildDir/java-1.8.0-openjdk-${version}.${buildVersion}.ojdkbuild.windows.x86_64.zip") }
+    from { zipTree("$buildDir/OpenJDK8_x64_Win_jdk${version}.zip") }
     into "$buildDir/win"
-    includeEmptyDirs = false
-    eachFile { details ->
-        def targetPath = (details.path.replace("java-1.8.0-openjdk-${version}.${buildVersion}.ojdkbuild.windows.x86_64/", 'openjdk8/'))
-        details.path = targetPath
-    }
 }
 
 task customizePackageWin(type: Copy, dependsOn: extractArchiveWin) {
-    from "files"
+    from("files/") {
+        include '*.cmd'
+        include '*.bat'
+    }
     into "$buildDir/win"
+    filter(ReplaceTokens, tokens: [version: version])
 }
 
 task buildPackageWin(type: Jar, dependsOn: customizePackageWin) {
@@ -53,10 +53,62 @@ task buildPackageWin(type: Jar, dependsOn: customizePackageWin) {
     classifier 'win'
     destinationDir buildDir
     from "$buildDir/win"
-    from("files/") {
-        include '*.cmd'
-        include '*.bat'
+}
+
+task downloadArchiveMac(type: Download) {
+    src "https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk${version}/OpenJDK8_x64_Mac_jdk${version}.tar.gz"
+    dest buildDir
+}
+
+task extractArchiveMac(type: Copy, dependsOn: downloadArchiveMac) {
+    from { tarTree(resources.gzip("$buildDir/OpenJDK8_x64_Mac_jdk${version}.tar.gz")) }
+    into "$buildDir/mac"
+}
+
+task customizePackageMac(type: Copy, dependsOn: extractArchiveMac) {
+  from("files/") {
+        exclude '*.cmd'
+        exclude '*.bat'
     }
+    into "$buildDir/mac"
+    filter(ReplaceTokens, tokens: [version: version])
+}
+
+task buildPackageMac(type: Jar, dependsOn: customizePackageMac) {
+    baseName project.name
+    version version
+    extension 'jar'
+    classifier 'mac'
+    destinationDir buildDir
+    from "$buildDir/mac"
+}
+
+task downloadArchiveLinux(type: Download) {
+    src "https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk${version}/OpenJDK8_x64_Linux_jdk${version}.tar.gz"
+    dest buildDir
+}
+
+task extractArchiveLinux(type: Copy, dependsOn: downloadArchiveLinux) {
+    from { tarTree(resources.gzip("$buildDir/OpenJDK8_x64_Linux_jdk${version}.tar.gz")) }
+    into "$buildDir/unix"
+}
+
+task customizePackageLinux(type: Copy, dependsOn: extractArchiveLinux) {
+  from("files/") {
+        exclude '*.cmd'
+        exclude '*.bat'
+    }
+    into "$buildDir/unix"
+    filter(ReplaceTokens, tokens: [version: version])
+}
+
+task buildPackageLinux(type: Jar, dependsOn: customizePackageLinux) {
+    baseName project.name
+    version version
+    extension 'jar'
+    classifier 'unix'
+    destinationDir buildDir
+    from "$buildDir/unix"
 }
 
 
@@ -64,6 +116,8 @@ publishing {
     publications {
         maven(MavenPublication) {
             artifact buildPackageWin
+            artifact buildPackageMac
+            artifact buildPackageLinux
         }
     }
     repositories {
