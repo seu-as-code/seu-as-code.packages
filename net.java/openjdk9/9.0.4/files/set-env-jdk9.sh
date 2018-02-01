@@ -1,0 +1,1 @@
+export JAVA9_HOME=$SOFTWARE_DIR/jdk-@version@
