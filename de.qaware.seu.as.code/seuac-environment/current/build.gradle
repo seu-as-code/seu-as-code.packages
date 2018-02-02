@@ -16,7 +16,6 @@
 
 plugins {
     id 'com.jfrog.bintray' version '1.2'
-    id 'de.qaware.seu.as.code.credentials' version '2.4.0'
 }
 
 apply plugin: 'base'
@@ -100,10 +99,6 @@ task buildPackageJdk8(type: Jar) {
     from "files/jdk8"
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
-}
-
 publishing {
     publications {
         seuacEnvironment(MavenPublication) {
@@ -117,17 +112,11 @@ publishing {
     }
     repositories {
         // set the properties via -P to publish to your company repo
-        // set the properties via -P to publish to your company repo
         maven {
             url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
             credentials {
-                if (project.credentials.get("nexus") != null) {
-                    username = project.credentials.get('nexus').username
-                    password = project.credentials.get('nexus').password
-                } else {
-                    username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
-                    password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
-                }
+                username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+                password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
             }
         }
     }
