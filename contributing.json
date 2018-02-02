@@ -10,7 +10,7 @@
     "subject_must_start_with_case": "upper",
     "subject_must_end_with_dot": true,
     "subject_must_close_github_issue": false,
-    "subject_must_include_github_issue": true,
+    "subject_must_include_github_issue": false,
     // Body is the rest of the commit message after the first paragraph,
     // separated by a blank line.
     "body_cannot_be_empty": false,
@@ -27,8 +27,7 @@
     "subject_must_start_with_case": "upper",
     "subject_must_not_end_with_dot": true,
     "subject_must_include_github_issue": false,
-
-    "body_cannot_be_empty": true,
+    "body_cannot_be_empty": false,
     "body_must_include_verification_steps": false,
     "body_must_close_github_issue": false,
     "body_must_include_github_issue": false
@@ -45,6 +44,7 @@
     "body_must_include_reproduction_steps": ["bug"],
     "label_must_be_set": true
   },
+  
   "branch": {
     "name_must_be_longer_than": 3,
     "name_must_be_shorter_than": 127,
