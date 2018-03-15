@@ -1,0 +1,107 @@
+/*
+ *    Copyright (C) 2018 QAware GmbH
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+plugins {
+	id 'de.undercouch.download' version '1.2'
+	id 'com.jfrog.bintray' version '1.2'
+}
+
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadArchive(type: Download) {
+	src "http://mirror.netcologne.de/apache.org/db/derby/${project.name}-${version}/${project.name}-${version}-bin.zip"
+  dest buildDir
+}
+
+task extractArchive(type: Copy, dependsOn: downloadArchive) {
+	from { zipTree("$buildDir/${project.name}-${version}-bin.zip") }
+	into "$buildDir/files"
+}
+
+task renameDirectory(dependsOn: extractArchive) {
+    doLast {
+        file("$buildDir/files/${project.name}-${version}-bin").renameTo(file("$buildDir/files/${project.name}-${version}"))
+    }
+}
+
+task customizePackage(type: Copy, dependsOn: renameDirectory) {
+	from "files"
+	into "$buildDir/files"
+}
+
+task buildPackage(type: Jar, dependsOn: customizePackage) {
+	baseName project.name
+	version version
+	extension 'jar'
+	destinationDir buildDir
+	from "$buildDir/files"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14.1'
+}
+
+/*
+publishing {
+    publications {
+  		derby(MavenPublication) {
+  			artifact "${buildDir}/${project.name}-${version}.jar"
+  		}
+    }
+  	repositories {
+  		// set the properties via -P to publish to your company repo
+  		maven {
+  			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+  			credentials {
+  				username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+  				password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+  			}
+  		}
+    }
+}
+
+bintray {
+  user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
+  key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
+  publications = ['derby']
+	publish = true
+	dryRun = false
+  pkg {
+    repo = project.bintrayRepo
+    name = project.name
+    desc = project.description
+    licenses = ['Apache-2.0']
+    labels = ['derby-db', 'seu-as-code', 'package']
+    websiteUrl = project.websiteUrl
+    issueTrackerUrl = project.issueTrackerUrl
+    vcsUrl = project.scmUrl
+    publicDownloadNumbers = true
+
+    version {
+      name = project.version
+	    desc = "${project.description} ${project.version}"
+	    released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+
+  		mavenCentralSync {
+  			sync = false
+  		}
+    }
+  }
+}
+*/
