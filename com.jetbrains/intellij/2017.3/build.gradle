@@ -27,7 +27,7 @@ task extractArchive(type: Copy, dependsOn: downloadArchive) {
 }
 
 task deleteIntelljJDK(type: Delete, dependsOn: extractArchive) {
-  delete "$buildDir/files/intellij-${version}/jre32", "$buildDir/files/intellij-${version}/jre64"
+  delete "$buildDir/files/jre32", "$buildDir/files/jre64"
   followSymlinks = true
 }
 
@@ -44,7 +44,7 @@ task buildPackage(type: Jar, dependsOn: deleteIntelljJDK) {
 	destinationDir buildDir
 	from "$buildDir/files"
 }
-/*
+
 publishing {
   publications {
 		intellij(MavenPublication) {
@@ -67,4 +67,3 @@ publishing {
 		}
     }
 }
-*/
