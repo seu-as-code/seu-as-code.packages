@@ -1,0 +1,151 @@
+/*
+ *    Copyright (C) 2019 QAware GmbH
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+plugins {
+  id 'de.undercouch.download' version '3.2.0'
+	id 'com.jfrog.bintray' version '1.2'
+  id 'de.qaware.seu.as.code.credentials' version '2.4.0'
+}
+
+apply plugin: 'base'
+apply plugin: 'maven-publish'
+
+import de.undercouch.gradle.tasks.download.Download
+
+task buildPackage(dependsOn: ['buildPackageWin', 'buildPackageUnix', 'buildPackageMac']) { }
+
+task downloadArchiveWin(type: Download) {
+	src "https://nodejs.org/dist/v${project.version}/node-v${project.version}-win-x64.zip"
+  dest "$buildDir"
+}
+
+task extractArchiveWin(type: Copy, dependsOn: downloadArchiveWin) {
+	from { zipTree("$buildDir/node-v${project.version}-win-x64.zip") }
+	into "$buildDir/win"
+}
+
+task buildPackageWin(type: Jar, dependsOn: extractArchiveWin) {
+	baseName project.name
+	version version
+  classifier 'win'
+	extension 'jar'
+	destinationDir buildDir
+  from "$buildDir/win"
+	from "files/win"
+}
+
+task downloadArchiveUnix(type: Download) {
+	src "https://nodejs.org/dist/v${project.version}/node-v${project.version}-linux-x64.tar.xz"
+  dest "$buildDir/unix/node-v${project.version}-linux-x64.tar.xz"
+}
+
+task extractArchiveUnix(type: Exec, dependsOn: downloadArchiveUnix) {
+  workingDir "$buildDir/unix/"
+  commandLine 'tar', 'xf', "node-v${project.version}-linux-x64.tar.xz"
+}
+
+task deleteArchiveUnix(type: Delete, dependsOn: extractArchiveUnix) {
+  delete "$buildDir/unix/node-v${project.version}-linux-x64.tar.xz"
+}
+
+task buildPackageUnix(type: Jar, dependsOn: deleteArchiveUnix) {
+	baseName project.name
+	version version
+  classifier 'unix'
+	extension 'jar'
+	destinationDir buildDir
+  from "$buildDir/unix"
+	from "files/unix"
+}
+
+task downloadArchiveMac(type: Download) {
+	src "https://nodejs.org/dist/v${project.version}/node-v${project.version}-darwin-x64.tar.gz"
+  dest "$buildDir/mac/node-v${project.version}-darwin-x64.tar.gz"
+}
+
+task extractArchiveMac(type: Exec, dependsOn: downloadArchiveMac) {
+  workingDir "$buildDir/mac/"
+  commandLine 'tar', 'xf', "node-v${project.version}-darwin-x64.tar.gz"
+}
+
+task deleteArchiveMac(type: Delete, dependsOn: extractArchiveMac) {
+  delete "$buildDir/mac/node-v${project.version}-darwin-x64.tar.gz"
+}
+
+task buildPackageMac(type: Jar, dependsOn: deleteArchiveMac) {
+	baseName project.name
+	version version
+  classifier 'mac'
+	extension 'jar'
+	destinationDir buildDir
+  from "$buildDir/mac"
+	from "files/mac"
+}
+
+publishing {
+  publications {
+		node(MavenPublication) {
+      artifact buildPackageWin
+      artifact buildPackageMac
+      artifact buildPackageUnix
+		}
+  }
+	repositories {
+    // set the properties via -P to publish to your company repo
+		maven {
+			url = project.hasProperty('nexusUrl') ? project.nexusUrl : ''
+      credentials {
+				if(project.credentials.get("nexus") != null){
+					username = project.credentials.get('nexus').username
+					password = project.credentials.get('nexus').password
+				}
+				else {
+					username = project.hasProperty('nexusUsername') ? project.nexusUsername : ''
+					password = project.hasProperty('nexusPassword') ? project.nexusPassword : ''
+				}
+		  }
+		}
+  }
+}
+
+bintray {
+  user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : 'unknown'
+  key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : 'unknown'
+  publications = ['node']
+	publish = true
+	dryRun = false
+  pkg {
+    repo = project.bintrayRepo
+    name = project.name
+    desc = project.description
+    licenses = ['Apache-2.0']
+    labels = ['node.js', 'npm', 'seu-as-code', 'package']
+    websiteUrl = project.websiteUrl
+    issueTrackerUrl = project.issueTrackerUrl
+    vcsUrl = project.scmUrl
+    publicDownloadNumbers = true
+
+    version {
+      name = project.version
+  		desc = "${project.description} ${project.version}"
+  		released = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
+
+  		mavenCentralSync {
+  			sync = false
+  		}
+    }
+  }
+}
