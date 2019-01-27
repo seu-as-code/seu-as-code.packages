@@ -34,7 +34,7 @@ that we can have a chance of keeping on top of things.
     why this is a problem, and how the patch fixes the problem when applied.
 ````
 
-* Make sure you have added the necessary tests for your changes.
+* Make sure you have added the necessary tests for your changes if required.
 * Run _all_ the tests to assure nothing else was accidentally broken.
 
 ## Making Trivial Changes
@@ -49,12 +49,9 @@ an issue number.
 ## Submitting Changes
 
 * Push your changes to a topic branch in your fork of the repository.
-* Submit a pull request to the repository in the puppetlabs organization.
-* Update your Jira ticket to mark that you have submitted code and are ready for it to be reviewed (Status: Ready for Review).
+* Submit a pull request to the repository in the *seu-as-code* organization.
+* Update your Github issue to mark that you have submitted code and are ready for it to be reviewed.
 * Include a link to the pull request in the ticket.
-* The core team looks at Pull Requests on a regular basis.
-* After feedback has been given we expect responses within two weeks. After two
-  weeks we may close the pull request if it isn't showing any activity.
 
 # Additional Resources
 
