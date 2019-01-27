@@ -1,0 +1,2 @@
+export SOAPUI_HOME=$SOFTWARE_DIR/soapui-5.4.0
+export SOAPUI_CLASSPATH=$SOAPUI_HOME/bin/soapui-5.4.0.jar:$SOAPUI_HOME/lib/*
