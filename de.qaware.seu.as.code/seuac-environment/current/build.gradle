@@ -26,7 +26,8 @@ task buildPackage(dependsOn: ['buildPackageDefault',
                               'buildPackageDefaultMac',
                               'buildPackageDefaultUnix',
                               'buildPackageJdk7',
-                              'buildPackageJdk8']) {
+                              'buildPackageJdk8',
+                              'buildPackageJdk9']) {
 }
 
 task buildPackageDefault(type: Jar) {
@@ -99,6 +100,18 @@ task buildPackageJdk8(type: Jar) {
     from "files/jdk8"
 }
 
+task buildPackageJdk9(type: Jar) {
+    baseName project.name
+    version version
+    classifier 'jdk9'
+    extension 'jar'
+    destinationDir buildDir
+    from("files/default") {
+        exclude 'set-env.*'
+    }
+    from "files/jdk9"
+}
+
 publishing {
     publications {
         seuacEnvironment(MavenPublication) {
@@ -108,6 +121,7 @@ publishing {
             artifact buildPackageDefaultUnix
             artifact buildPackageJdk7
             artifact buildPackageJdk8
+            artifact buildPackageJdk9
         }
     }
     repositories {

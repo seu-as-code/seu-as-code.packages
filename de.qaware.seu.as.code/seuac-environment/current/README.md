@@ -1,6 +1,6 @@
-# SEU-as-code Environment 2.5.0
+# SEU-as-code Environment 2.6.0
 
-The package contains the SEU-as-code Environment 2.5.0 release. From this version
+The package contains the SEU-as-code Environment 2.6.0 release. From this version
 on this package offers support for Windows and Mac OSX. Install this SEU-as-code
 package using one of the following dependency:
 
@@ -21,5 +21,10 @@ dependencies {
 	// expects an environment variable name JAVA8_HOME
 	// sets JAVA_HOME to JAVA8_HOME
 	// software 'de.qaware.seu.as.code:seuac-environment:2.5.0:jdk8'
+	
+    // to be used together with a JDK9 SEU-as-code package
+    // expects an environment variable name JAVA9_HOME
+    // sets JAVA_HOME to JAVA9_HOME
+    // software 'de.qaware.seu.as.code:seuac-environment:2.5.0:jdk9'
 }
 ```
