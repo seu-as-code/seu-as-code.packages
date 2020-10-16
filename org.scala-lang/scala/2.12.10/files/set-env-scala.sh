@@ -1,0 +1,3 @@
+
+export SCALA_HOME=$SOFTWARE_DIR/scala-2.12.10
+export PATH=$SCALA_HOME/bin:$PATH
